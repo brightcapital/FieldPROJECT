@@ -2,14 +2,15 @@ from datetime import datetime
 import pandas as pd
 from xbbg import blp
 
-def fetch_data_from_bloomberg(ticker_symbols, start_date, end_date):
-    data = blp.bdh(ticker_symbols, ['PX_LAST', 'CURR'], start_date, end_date, Per='M')
-    data = data.droplevel(level=0, axis=1)
 
+def fetch_data_from_bloomberg(ticker_symbols, start_date, end_date):
+    data = blp.bdh(tickers=ticker_symbols, flds=['last_price', 'NAV_CRNCY'],start_date=start_date, end_date=end_date, Per='M')
+    data.dropna(inplace=True, thresh=3,axis=0)
     # Save the data to a CSV file
     data.to_csv('bloomberg_data.csv')
 
     return data.head()
+
 
 if __name__ == "__main__":
     # Read ticker symbols from the CSV file
