@@ -3,15 +3,29 @@ import pandas as pd
 from xbbg import blp
 
 
-def fetch_data_from_bloomberg(ticker_symbols, start_date, end_date):
-    data = blp.bdh(tickers=ticker_symbols, flds=['last_price'],start_date=start_date, end_date=end_date, Per='M')
-    data.dropna(inplace=True, thresh=3,axis=0)
+def fetch_price_from_bloomberg(ticker_symbols, start_date, end_date):
+    price = blp.bdh(tickers=ticker_symbols, flds=['last_price'],start_date=start_date, end_date=end_date, Per='M')
+    price.dropna(inplace=True, thresh=3,axis=0)
 
     # Save the data to a CSV file
-    data.to_csv('bloomberg_price.csv')
+    price.to_csv('bloomberg_price.csv')
 
-    return data.head()
 
+def fetch_currency_from_bloomberg(ticker_symbols):
+    currency = blp.bdp(tickers=ticker_symbols, flds=['CRNCY'])
+    currency = currency.T
+
+    # Save the data to a CSV file
+    currency.to_csv('bloomberg_curr.csv')
+
+
+def merge_price_currency():
+    price_data = pd.read_csv('bloomberg_price.csv')
+    currency_data = pd.read_csv('bloomberg_curr.csv')
+
+    data_combined = pd.concat([currency_data,price_data],axis=0)
+
+    data_combined.to_csv('bloomberg_data.csv',index=False)
 
 if __name__ == "__main__":
     # Read ticker symbols from the CSV file
@@ -24,6 +38,6 @@ if __name__ == "__main__":
     # Determine today's date
     end_date = datetime.today()
 
-    retrieved_data = fetch_data_from_bloomberg(ticker_symbols, start_date, end_date)
-    print(f"Monthly data fetched from {start_date_str} to {end_date.strftime('%Y-%m-%d')}:")
-    print(retrieved_data)
+    fetch_price_from_bloomberg(ticker_symbols, start_date, end_date)
+    fetch_currency_from_bloomberg(ticker_symbols)
+    merge_price_currency()
