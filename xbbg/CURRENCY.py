@@ -4,11 +4,11 @@ from xbbg import blp
 
 
 def fetch_data_from_bloomberg(ticker_symbols):
-    data = blp.bdp(tickers=ticker_symbols, flds=['NAV_CRNCY', 'FUND_TOTAL_ASSETS_CRNCY'])
+    data = blp.bdp(tickers=ticker_symbols, flds=['CRNCY'])
     data = data.T
 
     # Save the data to a CSV file
-    data.to_csv('bloomberg_data_test_curr.csv')
+    data.to_csv('bloomberg_curr.csv')
 
     return data.head()
 
