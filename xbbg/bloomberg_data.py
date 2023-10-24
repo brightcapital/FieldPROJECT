@@ -14,6 +14,10 @@ def fetch_price_from_bloomberg(ticker_symbols, start_date, end_date):
 def fetch_currency_from_bloomberg(ticker_symbols):
     currency = blp.bdp(tickers=ticker_symbols, flds=['CRNCY'])
     currency = currency.T
+    if ticker_symbols == "XAG CURNCY" or "XAU CURNCY":
+        currency["XAG CURNCY"] = "USD"
+        currency["XAU CURNCY"] = "USD"
+
 
     # Save the data to a CSV file
     currency.to_csv('bloomberg_curr.csv')
