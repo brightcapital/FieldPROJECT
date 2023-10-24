@@ -5,11 +5,11 @@ from xbbg import blp
 
 def fetch_price_from_bloomberg(ticker_symbols, equities, currency, start_date, end_date):
     price_data = blp.bdh(tickers=ticker_symbols, flds=['last_price'],start_date=start_date, end_date=end_date, Per='M')
+    # to delete the empty rows which are the end days of month but not the working days
     price_data.dropna(inplace=True, thresh=3,axis=0)
-    price_data = price_data.drop(price_data.index[2])
-    price_data = price_data.rename(columns={'Unnamed: 0': 'BBG Ticker'})
-    price_data.insert(0, "Equities", equities)
-    price_data.insert(1, "Currency", currency)
+    price_data.columns = price_data.columns.droplevel(-1)
+    header = [ticker_symbols, equities, currency]
+    price_data.columns = header
 
     # Save the data to a CSV file
     price_data.to_csv('bloomberg_price.csv')
