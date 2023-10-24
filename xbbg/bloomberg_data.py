@@ -3,7 +3,7 @@ import pandas as pd
 from xbbg import blp
 
 
-def fetch_price_from_bloomberg(ticker_symbols, equities, currency, start_date, end_date):
+def fetch_price_from_bloomberg(ticker_symbols, equities, currency, start_date, end_date,path_to_csv):
     price_data = blp.bdh(tickers=ticker_symbols, flds=['last_price'],start_date=start_date, end_date=end_date, Per='M')
     # to delete the empty rows which are the end days of month but not the working days
     price_data.dropna(inplace=True, thresh=3,axis=0)
@@ -12,7 +12,7 @@ def fetch_price_from_bloomberg(ticker_symbols, equities, currency, start_date, e
     price_data.columns = header
 
     # Save the data to a CSV file
-    price_data.to_csv('bloomberg_price.csv')
+    price_data.to_csv(path_to_csv)
 
 
 if __name__ == "__main__":
@@ -24,6 +24,8 @@ if __name__ == "__main__":
     equities = bloomberg_equities['Equities']
     currency = bloomberg_equities['Currency']
 
+    path_to_csv = r'C:\Users\BrightsideCapital\New folder\Brightside Capital Dropbox\Brightside Capital (office)\22. INVESTMENT TEAM\Database\bloomberg_price.csv'
+
 
     start_date_str = input("Enter the start date (YYYY-MM-DD): ")
     start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
@@ -31,4 +33,4 @@ if __name__ == "__main__":
     # Determine today's date
     end_date = datetime.today()
 
-    fetch_price_from_bloomberg(ticker_symbols, equities, currency, start_date, end_date)
+    fetch_price_from_bloomberg(ticker_symbols, equities, currency, start_date, end_date, path_to_csv)
