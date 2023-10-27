@@ -6,6 +6,7 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
 import sys
+import csv
 
 
 # Function to fetch price data from Bloomberg
@@ -54,7 +55,21 @@ def on_timeout(window):
     window.quit()
     sys.exit("Program closed due to inactivity.")
 
+# Function to log successful runs
+def log_successful_run():
+    log_file_path = r'C:\Users\BrightsideCapital\New folder\Brightside Capital Dropbox\Brightside Capital (office)\22. INVESTMENT TEAM\Database\logfile.csv'
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open(log_file_path, mode='a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([timestamp, "Success"])
 
+# Function to run with default parameters
+def run_with_defaults(wait_label):
+    frequency = 'M'
+    start_date = date.today().replace(day=1)
+    run_fetch_data(frequency, start_date, wait_label)
+    log_successful_run()
+    
 # Function to run with default parameters
 def run_with_defaults(wait_label):
     frequency = 'M'
