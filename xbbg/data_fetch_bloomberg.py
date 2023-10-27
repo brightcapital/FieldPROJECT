@@ -12,12 +12,10 @@ import csv
 # Function to fetch price data from Bloomberg
 def fetch_price_from_bloomberg(ticker_symbols, equities, currency, start_date, end_date, frequency, wait_label):
     # Fetch price data from Bloomberg
-    print(ticker_symbols)
     price_data = blp.bdh(
         tickers=ticker_symbols, flds=['last_price'], start_date=start_date, end_date=end_date, Per=frequency
     )
 
-    print(price_data)
     # Delete empty rows
     price_data.dropna(inplace=True, thresh=3, axis=0)
 
@@ -37,13 +35,11 @@ def fetch_price_from_bloomberg(ticker_symbols, equities, currency, start_date, e
 
 # Function to check if ticker exists on Bloomberg
 def check_if_ticker_exists(ticker_symbols):
-    print(ticker_symbols)
     today  = date.today().replace(day=1)
     end_date = datetime.today()
     try:
         data = blp.bdh(
             tickers=ticker_symbols, flds=['last_price'],start_date=today, end_date=end_date, Per='D')
-        print(data)
         return not data.empty
     except Exception as e:
         print(f"Error occurred: {e}")
@@ -63,18 +59,13 @@ def log_successful_run():
         writer = csv.writer(file)
         writer.writerow([timestamp, "Success"])
 
-# Function to run with default parameters
-def run_with_defaults(wait_label):
-    frequency = 'M'
-    start_date = date.today().replace(day=1)
-    run_fetch_data(frequency, start_date, wait_label)
-    log_successful_run()
     
 # Function to run with default parameters
 def run_with_defaults(wait_label):
-    frequency = 'M'
+    frequency = 'D'
     start_date = date.today().replace(day=1)
     run_fetch_data(frequency, start_date, wait_label)
+    log_successful_run()
 
 
 # Function to fetch data
@@ -140,7 +131,6 @@ def create_input_window():
 
         if not start_date_str:
             start_date = date.today().replace(day=1)
-            print(start_date)
         else:
             try:
                 start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
@@ -263,8 +253,8 @@ if __name__ == "__main__":
     today = date.today()
     current_time = datetime.now().time()
      # automate the script to run at the first day of month and every monday
-    if ((today.day == 1 or today.weekday()==0) and datetime.strptime('20:00', '%H:%M').time() <= current_time <=
-            datetime.strptime('20:05', '%H:%M').time()) :
+    if ((today.day == 27 or today.weekday()==0) and datetime.strptime('16:10', '%H:%M').time() <= current_time <=
+            datetime.strptime('16:11', '%H:%M').time()) :
         run_with_defaults(no_wait_label)
 
     else:
