@@ -24,10 +24,11 @@ def fetch_price_from_bloomberg(ticker_symbols, equities, currency, start_date, e
     price_data.columns = header
 
 
-    path_to_csv = r'C:\Users\BrightsideCapital\New folder\Brightside Capital Dropbox\Brightside Capital (office)\22. INVESTMENT TEAM\Database\bloomberg_price.csv'
+    path_to_csv = r'C:\Users\BrightsideCapital\New folder\Brightside Capital Dropbox\Brightside Capital (office)\22. INVESTMENT TEAM\Database'
     # Save the data to a CSV file
-    file_name = frequency + '_bloomberg_price.csv'
+    file_name = "\\" + frequency + '_bloomberg_price.csv'
     file_path = path_to_csv + file_name
+    print(file_path)
     price_data.to_csv(file_path)
     if wait_label != 0:
         wait_label.config(text="Your file is ready to use @ DROPBOX: 22. INVESTMENT TEAM\Database\\bloomberg_price.csv")
@@ -253,8 +254,8 @@ if __name__ == "__main__":
     today = date.today()
     current_time = datetime.now().time()
      # automate the script to run at the first day of month and every monday
-    if ((today.day == 27 or today.weekday()==0) and datetime.strptime('16:10', '%H:%M').time() <= current_time <=
-            datetime.strptime('16:11', '%H:%M').time()) :
+    if ((today.day == 27 or today.weekday()==0) and datetime.strptime('16:24', '%H:%M').time() <= current_time <=
+            datetime.strptime('16:28', '%H:%M').time()) :
         run_with_defaults(no_wait_label)
 
     else:
