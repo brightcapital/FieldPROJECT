@@ -6,33 +6,43 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
 import sys
-import calendar
 
 
 # Function to fetch price data from Bloomberg
 def fetch_price_from_bloomberg(ticker_symbols, equities, currency, start_date, end_date, frequency, wait_label):
     # Fetch price data from Bloomberg
+    print(ticker_symbols)
     price_data = blp.bdh(
         tickers=ticker_symbols, flds=['last_price'], start_date=start_date, end_date=end_date, Per=frequency
     )
+
+    print(price_data)
     # Delete empty rows
     price_data.dropna(inplace=True, thresh=3, axis=0)
+
     price_data.columns = price_data.columns.droplevel(-1)
     header = [ticker_symbols, equities, currency]
     price_data.columns = header
 
+
+    path_to_csv = r'C:\Users\BrightsideCapital\New folder\Brightside Capital Dropbox\Brightside Capital (office)\22. INVESTMENT TEAM\Database\bloomberg_price.csv'
     # Save the data to a CSV file
     file_name = frequency + '_bloomberg_price.csv'
-    price_data.to_csv(file_name)
+    file_path = path_to_csv + file_name
+    price_data.to_csv(file_path)
     if wait_label != 0:
-        wait_label.config(text="Your file is ready to use.")
+        wait_label.config(text="Your file is ready to use @ DROPBOX: 22. INVESTMENT TEAM\Database\\bloomberg_price.csv")
 
 
 # Function to check if ticker exists on Bloomberg
 def check_if_ticker_exists(ticker_symbols):
-    today = date.today()
+    print(ticker_symbols)
+    today  = date.today().replace(day=1)
+    end_date = datetime.today()
     try:
-        data = blp.bdh(tickers=ticker_symbols, flds=['last_price'], start_date=today, end_date=today, Per='D')
+        data = blp.bdh(
+            tickers=ticker_symbols, flds=['last_price'],start_date=today, end_date=end_date, Per='D')
+        print(data)
         return not data.empty
     except Exception as e:
         print(f"Error occurred: {e}")
@@ -55,7 +65,8 @@ def run_with_defaults(wait_label):
 # Function to fetch data
 def run_fetch_data(frequency, start_date, wait_label):
     # Read ticker symbols, equities, and currency from the CSV file
-    bloomberg_equities = pd.read_csv('bloomberg_tickers.csv', index_col=False)
+    path_to_tickers = r"C:\Users\BrightsideCapital\PycharmProjects\FieldPROJECT\xbbg\bloomberg_tickers.csv"
+    bloomberg_equities = pd.read_csv(path_to_tickers, index_col=False)
     bloomberg_equities = bloomberg_equities.sort_values(by=['BBG Ticker'], ignore_index=True)
 
     ticker_symbols = bloomberg_equities['BBG Ticker']
@@ -92,7 +103,8 @@ def create_input_window():
 
             else:
                 try:
-                    bloomberg_equities = pd.read_csv('bloomberg_tickers.csv', index_col=False)
+                    path_to_tickers = r"C:\Users\BrightsideCapital\PycharmProjects\FieldPROJECT\xbbg\bloomberg_tickers.csv"
+                    bloomberg_equities = pd.read_csv(path_to_tickers, index_col=False)
                     existing_tickers = list(bloomberg_equities['BBG Ticker'])
                 except FileNotFoundError:
                     existing_tickers = []
@@ -113,6 +125,7 @@ def create_input_window():
 
         if not start_date_str:
             start_date = date.today().replace(day=1)
+            print(start_date)
         else:
             try:
                 start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
@@ -138,7 +151,7 @@ def create_input_window():
                 print("New Ticker added to CSV file")
 
             run_fetch_data(frequency, start_date, wait_label)
-            window.destroy()
+            #window.destroy()
 
     # Set up the input window
     window = tk.Tk()
@@ -215,6 +228,13 @@ def create_input_window():
     instruction_label = ttk.Label(frame, text=instructions_text, wraplength=800)
     instruction_label.grid(row=8, column=0, columnspan=2, pady=10)
 
+    footer_text = """ By: Shradha Maria and Mariam Lailshvili
+    USI Field Project"""
+
+    footer_label = ttk.Label(frame, text=footer_text, wraplength=800)
+    footer_label.grid(row=11, column=4, columnspan=2, pady=10)
+
+
     # Set the timeout function for the window
     window.after(3000000, on_timeout, window)
     window.mainloop()
@@ -225,17 +245,11 @@ if __name__ == "__main__":
 
     no_wait_label = 0
 
-    """
-    # run the code without tkinter window if its end day of month
-    today = date.today()
-    if today == today.replace(day=calendar.monthrange(today.year, today.month)[1]):
-        run_with_defaults(no_wait_label)
-    """
     today = date.today()
     current_time = datetime.now().time()
-
-    if (today.day == 1 and datetime.strptime('20:00', '%H:%M').time() <= current_time <=
-            datetime.strptime('20:05', '%H:%M').time()):
+     # automate the script to run at the first day of month and every monday
+    if ((today.day == 1 or today.weekday()==0) and datetime.strptime('20:00', '%H:%M').time() <= current_time <=
+            datetime.strptime('20:05', '%H:%M').time()) :
         run_with_defaults(no_wait_label)
 
     else:
