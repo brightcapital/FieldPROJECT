@@ -10,19 +10,21 @@ import csv
 
 
 # Function to fetch price data from Bloomberg
-def fetch_price_from_bloomberg(ticker_symbols, equities, currency, start_date, end_date, frequency, wait_label):
+def fetch_price_from_bloomberg(ticker_symbols, equities, currency, start_date, end_date, frequency, new_data, wait_label):
+
+
     # Fetch price data from Bloomberg
     price_data = blp.bdh(
         tickers=ticker_symbols, flds=['last_price'], start_date=start_date, end_date=end_date, Per=frequency
     )
-
+    if price_data.empty:
+        return False
     # Delete empty rows
     price_data.dropna(inplace=True, thresh=3, axis=0)
 
     price_data.columns = price_data.columns.droplevel(-1)
     header = [ticker_symbols, equities, currency]
     price_data.columns = header
-
 
     path_to_csv = r'C:\Users\BrightsideCapital\New folder\Brightside Capital Dropbox\Brightside Capital (office)\22. INVESTMENT TEAM\Database'
     # Save the data to a CSV file
@@ -63,28 +65,33 @@ def log_successful_run():
     
 # Function to run with default parameters
 def run_with_defaults(wait_label):
-    frequency = 'D'
+    frequency = 'M'
     start_date = date.today().replace(day=1)
-    run_fetch_data(frequency, start_date, wait_label)
+    new_data = pd.DataFrame()
+    run_fetch_data(frequency, start_date, new_data, wait_label)
     log_successful_run()
 
 
 # Function to fetch data
-def run_fetch_data(frequency, start_date, wait_label):
+def run_fetch_data(frequency, start_date, new_data, wait_label):
     # Read ticker symbols, equities, and currency from the CSV file
     path_to_tickers = r"C:\Users\BrightsideCapital\PycharmProjects\FieldPROJECT\xbbg\bloomberg_tickers.csv"
     bloomberg_equities = pd.read_csv(path_to_tickers, index_col=False)
+    # bloomberg_equities = pd.concat(bloomberg_equities, new_data)
+
+    bloomberg_equities = pd.concat([bloomberg_equities,new_data], ignore_index=True)
     bloomberg_equities = bloomberg_equities.sort_values(by=['BBG Ticker'], ignore_index=True)
 
     ticker_symbols = bloomberg_equities['BBG Ticker']
+
     equities = bloomberg_equities['Equities']
     currency = bloomberg_equities['Currency']
 
     # Determine today's date
     end_date = datetime.today()
 
-    fetch_price_from_bloomberg(ticker_symbols, equities, currency, start_date, end_date, frequency, wait_label)
-
+    empty_data = fetch_price_from_bloomberg(ticker_symbols, equities, currency, start_date, end_date, frequency, new_data, wait_label)
+    return empty_data
 
 # Function to create input window
 def create_input_window():
@@ -111,6 +118,7 @@ def create_input_window():
             else:
                 try:
                     path_to_tickers = r"C:\Users\BrightsideCapital\PycharmProjects\FieldPROJECT\xbbg\bloomberg_tickers.csv"
+
                     bloomberg_equities = pd.read_csv(path_to_tickers, index_col=False)
                     existing_tickers = list(bloomberg_equities['BBG Ticker'])
                 except FileNotFoundError:
@@ -151,13 +159,22 @@ def create_input_window():
                     'Equities': equities_input_list,
                     'Currency': currency_input_list
                 })
+            else:
+                new_data = pd.DataFrame()
 
-                # Append the new data to the CSV file
-                new_data.to_csv('bloomberg_tickers.csv', mode='a', header=False, index=False)
+            empty_data_error = run_fetch_data(frequency, start_date, new_data, wait_label)
+            if empty_data_error == False:
+                errors.append("empty data fetched, please check all the fields")
+                messagebox.showerror("Error", "\n".join(errors))
+                print("gghhhh")
+
+            if not errors:
+                #Append the new data to the CSV file
+                new_data.to_csv(r"C:\Users\BrightsideCapital\PycharmProjects\FieldPROJECT\xbbg\bloomberg_tickers.csv", mode='a', header=False, index=False)
                 print("New Ticker added to CSV file")
 
-            run_fetch_data(frequency, start_date, wait_label)
-            #window.destroy()
+
+            #window.after(3000, lambda:window.destroy())
 
     # Set up the input window
     window = tk.Tk()
@@ -254,8 +271,8 @@ if __name__ == "__main__":
     today = date.today()
     current_time = datetime.now().time()
      # automate the script to run at the first day of month and every monday
-    if ((today.day == 27 or today.weekday()==0) and datetime.strptime('16:24', '%H:%M').time() <= current_time <=
-            datetime.strptime('16:28', '%H:%M').time()) :
+    if ((today.day == 1 or today.weekday()==0) and datetime.strptime('20:30', '%H:%M').time() <= current_time <=
+            datetime.strptime('20:35', '%H:%M').time()) :
         run_with_defaults(no_wait_label)
 
     else:
