@@ -6,13 +6,21 @@ import csv
 import streamlit as st
 
 # Function to fetch price data from Bloomberg
-def fetch_price_from_bloomberg(ticker_symbols, equities, currency, start_date, end_date, frequency, path_to_csv):
+def check_if_empty(ticker_symbols, start_date, frequency):
+    # Determine today's date
+    end_date = datetime.today()
     # Fetch price data from Bloomberg
     price_data = blp.bdh(
         tickers=ticker_symbols, flds=['last_price'], start_date=start_date, end_date=end_date, Per=frequency
     )
     if price_data.empty:
         return False
+
+def fetch_price_from_bloomberg(ticker_symbols, equities, currency, start_date, end_date, frequency, path_to_csv):
+    # Fetch price data from Bloomberg
+    price_data = blp.bdh(
+        tickers=ticker_symbols, flds=['last_price'], start_date=start_date, end_date=end_date, Per=frequency
+    )
     # Delete empty rows
     price_data.dropna(inplace=True, thresh=3, axis=0)
 
@@ -21,7 +29,7 @@ def fetch_price_from_bloomberg(ticker_symbols, equities, currency, start_date, e
     price_data.columns = header
 
     # Add timestamp to the file name
-    timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     file_name = "\\" + frequency + '_bloomberg_price_' + timestamp + '.csv'
     file_path = path_to_csv + file_name
     price_data.to_csv(file_path)
@@ -187,8 +195,9 @@ def add_or_delete_data(path_to_tickers, path_to_csv):
                 'Currency': currency_input_list
             })
 
-            wait_label.text("Please wait while we fetch the requested data...")
-            empty_data_error = run_fetch_data(path_to_tickers, frequency, start_date, path_to_csv)
+
+            empty_data_error = check_if_empty(ticker_symbols, start_date, frequency)
+
 
             if empty_data_error == False:
                 wait_label.text("Error......")
@@ -200,6 +209,8 @@ def add_or_delete_data(path_to_tickers, path_to_csv):
                 # Append the new data to the CSV file
                 new_data.to_csv(path_to_tickers, mode='a', header=False, index=False)
                 st.success("New Ticker added to CSV file")
+                wait_label.text("Please wait while we fetch the requested data...")
+                run_fetch_data(path_to_tickers, frequency, start_date, path_to_csv)
                 st.write("Your file is ready to use")
 
 
@@ -212,7 +223,7 @@ if __name__ == '__main__':
 
     today = date.today()
     # Read the CSV file
-    path_to_tickers = r"/Users/shradhamaria/Desktop/FieldPROJECT/bloomberg_tickers.csv"
+    path_to_tickers = r"C:\Users\BrightsideCapital\PycharmProjects\FieldPROJECT/bloomberg_tickers.csv"
     #input for log file path
     log_file_path = r'C:\Users\BrightsideCapital\New folder\Brightside Capital Dropbox\Brightside Capital (office)\22. INVESTMENT TEAM\Database\logfile.csv'
     #input for CSV path
