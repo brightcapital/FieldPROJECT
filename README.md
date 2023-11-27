@@ -17,12 +17,11 @@ The script utilizes the Streamlit framework for the user interface and Bokeh for
 - Xbbg
 - Requests
 - Streamlit
-- Bokeh
 
 Install the required packages using:
 
 ```bash
-pip install pandas xbbg requests streamlit bokeh
+pip install pandas xbbg requests streamlit
 ```
 
 ## Usage
@@ -39,15 +38,6 @@ pip install pandas xbbg requests streamlit bokeh
     ```bash
     streamlit run data_fetcher_streamlit.py
     ```
-   
-   The script will prompt you to enter the paths to the required files:
-
-    - Enter the path to the price data CSV file.
-    - Enter the path to the tickers CSV file.
-    - Enter the path to the log file.
-    - Enter the path to the CSV folder.
-
-    Follow the prompts to input these paths and press Enter to run the script.
 
 
 3. **Automated Execution:**
