@@ -33,8 +33,6 @@ pip install pandas xbbg requests streamlit
 
 2. **Run the Script:**
 
-   For data_fetcher_streamlit.py
-
     ```bash
     streamlit run data_fetcher_streamlit.py
     ```
