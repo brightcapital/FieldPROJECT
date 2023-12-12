@@ -27,7 +27,7 @@ def fetch_price_from_bloomberg(ticker_symbols, equities, currency, start_date, e
     price_data.columns = price_data.columns.droplevel(-1)
     header = [ticker_symbols]
     price_data.columns = header
-
+    price_data = price_data.rename(columns={price_data.columns[0]: 'Dates'})
     date_column_name = 'Dates'
 
     # Convert the specified column to timestamp format with dayfirst=True
