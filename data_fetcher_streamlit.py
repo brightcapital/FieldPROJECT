@@ -25,8 +25,16 @@ def fetch_price_from_bloomberg(ticker_symbols, equities, currency, start_date, e
     price_data.dropna(inplace=True, thresh=3, axis=0)
 
     price_data.columns = price_data.columns.droplevel(-1)
-    header = [ticker_symbols, equities, currency]
+    header = [ticker_symbols]
     price_data.columns = header
+
+    date_column_name = 'Dates'
+
+    # Convert the specified column to timestamp format with dayfirst=True
+    price_data[date_column_name] = pd.to_datetime(price_data[date_column_name], dayfirst=True)
+
+    # Format the timestamp column in the desired QuestDB format
+    price_data[date_column_name] = price_data[date_column_name].dt.strftime('%Y-%m-%dT%H:%M:%S')
 
     # Add timestamp to the file name
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")

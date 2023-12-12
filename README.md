@@ -30,7 +30,10 @@ pip install pandas xbbg requests streamlit
     ```bash
     git clone https://github.com/brightcapital/FieldPROJECT.git
     ```
-
+   ```bash
+    cd FieldPROJECT
+    ```
+   
 2. **Run the Script:**
 
     ```bash
